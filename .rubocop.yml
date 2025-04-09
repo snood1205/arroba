@@ -5,3 +5,7 @@ plugins:
 AllCops:
   TargetRubyVersion: 3.4
   NewCops: enable
+
+# Disable because there are many api methods that start with get_
+Naming/AccessorMethodName:
+  Enabled: false
