@@ -1,36 +1,22 @@
 # frozen_string_literal: true
 
+require_relative '../validations'
+
 module Arroba
   class BSky
-    class Actor
-      def initialize(client)
-        @client = client
-      end
+    class Actor < BaseResource
+      include Validations::Limitable
 
-      def get_preferences
-        @client.get '/xrpc/app.bsky.actor.getPreferences'
-      end
+      basic_get :get_preferences
 
-      def get_profile(actor:)
-        @client.get '/xrpc/app.bsky.actor.getProfile', query_params: { actor: }
-      end
-
-      def get_profiles(actors:)
-        @client.get '/xrpc/app.bsky.actor.getProfiles', query_params: { actors: }
-      end
-
-      def get_suggestions(limit: nil)
-        if limit && (limit < 1 || limit > 100)
-          raise ArgumentError,
-                'Limit must be an integer between 1 and 100, inclusive'
-        end
-
-        query_params = limit ? { limit: } : nil
-        get '/xrpc/app.bsky.actor.getSuggestions', query_params:
-      end
+      get_with_query_params :get_profile, :actor
+      get_with_query_params :get_profiles, :actors
+      get_with_query_params :get_suggestions, limit: nil, &DEFAULT_LIMIT
+      get_with_query_params :search_actors, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
+      get_with_query_params :search_actors_typeahead, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
 
       def put_preferences!(preferences:)
-        post '/xrpc/app.bsky.actor.putPreferences', body: { preferences: }
+        post body: { preferences: }
       end
     end
   end

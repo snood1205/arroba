@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'base_resource'
 require_relative 'bsky'
 require_relative 'http_client'
 

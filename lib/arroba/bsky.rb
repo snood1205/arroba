@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
 require_relative 'bsky/actor'
+require_relative 'bsky/feed'
 
 module Arroba
   class BSky
-    attr_reader :actor
-
     def initialize(client)
-      @actor = Actor.new client
+      @client = client
     end
+
+    def actor = @actor ||= Actor.new(@client)
+
+    def feed = @feed ||= Feed.new(@client)
   end
 end

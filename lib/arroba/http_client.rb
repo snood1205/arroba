@@ -11,10 +11,10 @@ module Arroba
       authenticate!(identifier, password)
     end
 
-    def get(url, query_params: nil)
+    def get(url, query_params: nil, with_auth: true)
       uri = build_uri url, query_params
       request = Net::HTTP::Get.new(uri)
-      request['Authorization'] = "Bearer #{@bearer_token}"
+      request['Authorization'] = "Bearer #{@bearer_token}" if with_auth
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
         http.request request

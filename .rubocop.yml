@@ -9,3 +9,7 @@ AllCops:
 # Disable because there are many api methods that start with get_
 Naming/AccessorMethodName:
   Enabled: false
+
+# Disable as some api params are short
+Naming/MethodParameterName:
+  Enabled: false
