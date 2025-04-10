@@ -4,6 +4,7 @@ require_relative '../validations'
 
 module Arroba
   class BSky
+    # The Actor resource provides access to user profiles and related data.
     class Actor < BaseResource
       include Validations::Limitable
 

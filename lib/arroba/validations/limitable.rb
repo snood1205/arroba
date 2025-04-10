@@ -2,6 +2,7 @@
 
 module Arroba
   module Validations
+    # Limitable is a module that provides functionality to enforce limits on query parameters.
     module Limitable
       DEFAULT_LIMIT = ->(limit: nil, **) { enforce_limit! limit, min: 1, max: 100 }.freeze
 

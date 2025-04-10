@@ -5,6 +5,12 @@ require_relative 'bsky'
 require_relative 'http_client'
 
 module Arroba
+  # This class is the main entry point for the Arroba gem.
+  # It provides a simple interface to interact with the Bluesky API.
+  #
+  # @example
+  #    app = Arroba::Client.new(identifier: 'your_identifier', password: 'your_password')
+  #    app.bsky.actor.get_profile(actor: 'example_handle')
   class Client
     attr_reader :bsky
 

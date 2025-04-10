@@ -1,6 +1,17 @@
 # frozen_string_literal: true
 
 module Arroba
+  # Serves as a base class for all resources in the Arroba gem.
+  #
+  # This class provides a set of methods for making HTTP requests to the
+  # Arroba API. It also includes utility methods for constructing URLs and
+  # validating parameters.
+  #
+  # @abstract
+  #
+  # @see Arroba::Client
+  # @see Arroba::BSky
+  # @see Arroba::Validations
   class BaseResource
     def get(**) = request(:get, **)
     def post(**) = request(:post, **)
@@ -28,7 +39,7 @@ module Arroba
         define_method method_name do |**initial_query_params|
           validate_missing! required_params, initial_query_params
           validate_extra! allowed_params, initial_query_params
-          query_params = optional_params.merge(initial_query_params).compact
+          query_params = merge_query_params optional_params, initial_query_params
 
           yield(**query_params) if block_given?
           camelized_query_params = query_params.transform_keys { |key| camelize key.to_s }
@@ -40,6 +51,8 @@ module Arroba
     end
 
     protected
+
+    def merge_query_params(optional_params, initial_query_params) = optional_params.merge(initial_query_params).compact
 
     def validate_missing!(required_params, present_params)
       missing_required = required_params - present_params.keys

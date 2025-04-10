@@ -4,6 +4,7 @@ require_relative '../validations'
 
 module Arroba
   class BSky
+    # The Feed resource provides access to posts, likes, reposts, and other
     class Feed < BaseResource
       include Validations::Limitable
       # NOTE: it is described as not needing auth so with_auth is set to false, but it has given me 400 for that.

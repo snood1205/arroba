@@ -5,6 +5,8 @@ require 'net/http'
 require 'uri'
 
 module Arroba
+  # HTTPClient is responsible for making HTTP requests to the atProto API.
+  # It handles authentication and provides methods for GET and POST requests.
   class HTTPClient
     def initialize(identifier:, password:, base_url:, always_auth: false)
       @base_url = base_url

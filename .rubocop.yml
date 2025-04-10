@@ -6,10 +6,22 @@ AllCops:
   TargetRubyVersion: 3.4
   NewCops: enable
 
-# Disable because there are many api methods that start with get_
-Naming/AccessorMethodName:
-  Enabled: false
+Layout/LineLength:
+  Exclude:
+    - 'bin/*'
 
-# Disable as some api params are short
-Naming/MethodParameterName:
-  Enabled: false
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'bin/*'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'bin/*'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'bin/*'
+
+Style/Documentation:
+  AllowedConstants:
+    - 'ClassMethods'
