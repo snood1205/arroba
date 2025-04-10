@@ -6,15 +6,16 @@ require 'uri'
 
 module Arroba
   class HTTPClient
-    def initialize(identifier:, password:, base_url:)
+    def initialize(identifier:, password:, base_url:, always_auth: false)
       @base_url = base_url
+      @always_auth = always_auth
       authenticate!(identifier, password)
     end
 
     def get(url, query_params: nil, with_auth: true)
       uri = build_uri url, query_params
       request = Net::HTTP::Get.new(uri)
-      request['Authorization'] = "Bearer #{@bearer_token}" if with_auth
+      authorize_request! request, with_auth
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
         http.request request
@@ -25,8 +26,10 @@ module Arroba
       JSON.parse(response.body)
     end
 
-    def post(url, body:)
+    def post(url, body:, with_auth: true)
       uri = build_uri url
+      request = Net::HTTP::Post.new(uri)
+      authorize_request! request, with_auth
       response = json_request(uri, body, method: :post)
       raise "Request failed: #{response.message}" unless response.is_a?(Net::HTTPSuccess)
 
@@ -51,6 +54,10 @@ module Arroba
       @handle = body['handle']
       @did = body['did']
       @bearer_token = body['accessJwt']
+    end
+
+    def authorize_request!(request, with_auth)
+      request['Authorization'] = "Bearer #{@bearer_token}" if @always_auth || with_auth
     end
 
     def json_request(url, body, method: :post)

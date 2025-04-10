@@ -3,13 +3,27 @@
 module Arroba
   module Validations
     module Limitable
-      DEFAULT_LIMIT = ->(limit) { enforce_limit! limit, min: 1, max: 100 }.freeze
+      DEFAULT_LIMIT = ->(limit: nil, **) { enforce_limit! limit, min: 1, max: 100 }.freeze
 
       def self.enforce_limit!(limit, min:, max:, name: 'Limit')
         puts limit
         return if limit.nil? || (limit.is_a?(Integer) && limit.between?(min, max))
 
         raise ArgumentError, "#{name} must be an integer between 1 and 100, inclusive"
+      end
+
+      def self.included(base)
+        base.extend ClassMethods
+      end
+
+      module ClassMethods
+        def get_with_enforced_limit(method_name, *, limit: nil, cursor: nil, **)
+          get_with_query_params method_name, *, limit:, cursor:, ** do |**query_params|
+            DEFAULT_LIMIT.call(limit:, **query_params)
+
+            yield if block_given?
+          end
+        end
       end
     end
   end

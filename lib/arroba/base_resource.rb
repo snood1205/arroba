@@ -30,7 +30,7 @@ module Arroba
           validate_extra! allowed_params, initial_query_params
           query_params = optional_params.merge(initial_query_params).compact
 
-          yield query_params[:limit] if block_given?
+          yield(**query_params) if block_given?
           camelized_query_params = query_params.transform_keys { |key| camelize key.to_s }
 
           url = construct_url self.class.name, method_name
