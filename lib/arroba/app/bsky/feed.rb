@@ -38,10 +38,7 @@ module Arroba
           raise ArgumentError, 'sort must be "top" or "latest"' if !sort.nil? && sort != 'top' && sort != 'latest'
           raise ArgumentError, 'tag elements must be shorter than 640 characters' if tag&.any? { |t| t.length > 640 }
         end
-
-        def send_interactions!(interactions:)
-          post body: { interactions: }
-        end
+        basic_post :send_interactions, :interactions
       end
     end
   end

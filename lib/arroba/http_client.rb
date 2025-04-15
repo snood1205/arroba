@@ -16,8 +16,7 @@ module Arroba
 
     def get(url, query_params: nil, with_auth: true)
       uri = build_uri url, query_params
-      request = Net::HTTP::Get.new(uri)
-      authorize_request! request, with_auth
+      request = request_object(:get, uri, with_auth:)
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
         http.request request
@@ -30,12 +29,16 @@ module Arroba
 
     def post(url, body:, with_auth: true)
       uri = build_uri url
-      request = Net::HTTP::Post.new(uri)
-      authorize_request! request, with_auth
-      response = json_request(uri, body, method: :post)
+      response = json_request(uri, body, method: :post, with_auth:)
       raise "Request failed: #{response.message}" unless response.is_a?(Net::HTTPSuccess)
 
-      JSON.parse(response.body)
+      if response.body.empty?
+        response.message
+      else
+        JSON.parse(response.body)
+      end
+    rescue JSON::ParserError
+      puts response.body
     end
 
     # Explicitly defined to hide secrets in inspect output
@@ -62,17 +65,23 @@ module Arroba
       request['Authorization'] = "Bearer #{@bearer_token}" if @always_auth || with_auth
     end
 
-    def json_request(url, body, method: :post)
+    def json_request(url, body, method: :post, with_auth: false)
       uri = URI(url)
       begin
-        req_class = Object.const_get "Net::HTTP::#{method.capitalize}"
-        request = req_class.new(uri)
+        request = request_object(method, uri, with_auth:)
         request['Content-Type'] = 'application/json'
         request.body = body.to_json
         make_request(uri) { |http| http.request request }
       rescue NameError
         raise ArgumentError, "Invalid HTTP method: #{method}"
       end
+    end
+
+    def request_object(method, uri, with_auth:)
+      req_class = Object.const_get "Net::HTTP::#{method.capitalize}"
+      request = req_class.new(uri)
+      authorize_request! request, with_auth
+      request
     end
 
     def make_request(uri, &)

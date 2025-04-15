@@ -31,16 +31,13 @@ module Arroba
           enforce_limit! uris.count, min: 0, max: 25, name: 'The length of array uris'
         end
         get_with_query_params :get_suggested_follows_by_actor, :actor
-
-        def mute_actor_list!(list:) = post body: { list: }
-        def mute_actor!(actor:) = post body: { actor: }
-        def mute_thread!(root:) = post body: { root: }
-
+        basic_post :mute_actor_list, :list
+        basic_post :mute_actor, :actor
+        basic_post :mute_thread, :root
         get_with_enforced_limit :search_starter_packs, :q
-
-        def unmute_actor_list!(list:) = post body: { list: }
-        def unmute_actor!(actor:) = post body: { actor: }
-        def unmute_thread!(root:) = post body: { root: }
+        basic_post :unmute_actor_list, :list
+        basic_post :unmute_actor, :actor
+        basic_post :unmute_thread, :root
       end
     end
   end

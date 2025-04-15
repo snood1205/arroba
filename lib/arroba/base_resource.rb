@@ -24,12 +24,10 @@ module Arroba
     end
 
     module ClassMethods
-      def basic_get(*method_names)
-        method_names.each do |method_name|
-          define_method method_name do
-            url = construct_url self.class.name, method_name
-            request :get, url:
-          end
+      def basic_get(method_name)
+        define_method method_name do
+          url = construct_url self.class.name, method_name
+          request :get, url:
         end
       end
 
@@ -46,6 +44,16 @@ module Arroba
 
           url = construct_url self.class.name, method_name
           request :get, url:, query_params: camelized_query_params
+        end
+      end
+
+      def basic_post(method_name, *required_params)
+        define_method "#{method_name}!" do |**body|
+          validate_missing! required_params, body
+          validate_extra! required_params, body
+          camelized_body = body.transform_keys { |key| camelize key.to_s }
+          url = construct_url self.class.name, method_name
+          request :post, url:, body: camelized_body
         end
       end
     end
