@@ -93,7 +93,7 @@ module Arroba
     end
 
     def class_name_to_package(class_name)
-      class_name.downcase.gsub('::', '.').sub('arroba', 'app')
+      class_name.downcase.gsub('::', '.').delete_prefix 'arroba.'
     end
 
     def camelize(non_camelized)
