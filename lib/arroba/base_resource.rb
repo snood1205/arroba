@@ -87,7 +87,7 @@ module Arroba
     end
 
     def construct_url(class_name, method)
-      url_method = camelize method.to_s
+      url_method = camelize(method.to_s).chomp '!'
       package = class_name_to_package class_name
       "/xrpc/#{package}.#{url_method}"
     end
