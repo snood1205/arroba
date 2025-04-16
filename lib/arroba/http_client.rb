@@ -8,10 +8,9 @@ module Arroba
   # HTTPClient is responsible for making HTTP requests to the atProto API.
   # It handles authentication and provides methods for GET and POST requests.
   class HTTPClient
-    def initialize(identifier:, password:, base_url:, always_auth: false)
-      @base_url = base_url
+    def initialize(identifier:, password:, auth_url:, always_auth: false)
       @always_auth = always_auth
-      authenticate!(identifier, password)
+      authenticate!(auth_url, identifier, password)
     end
 
     def get(url, query_params: nil, with_auth: true)
@@ -46,15 +45,21 @@ module Arroba
       "#<Arroba::HTTPClient:0x#{object_id} @handle=#{@handle} @did=#{@did}>"
     end
 
+    def proxy_for_chat!
+      @atproto_proxy = 'did:web:api.bsky.chat#bsky_chat'
+      @proxy_check = 'chat'
+    end
+
     private
 
-    def authenticate!(identifier, password)
-      uri = build_uri '/xrpc/com.atproto.server.createSession'
+    def authenticate!(auth_url, identifier, password)
+      uri = URI("#{auth_url}/xrpc/com.atproto.server.createSession")
       response = json_request(uri, { identifier: identifier, password: password })
 
       raise "Authentication failed: #{response.message}" unless response.is_a?(Net::HTTPSuccess)
 
       body = JSON.parse(response.body)
+      @base_url = body['didDoc']['service'][0]['serviceEndpoint']
       @refresh_token = body['refreshJwt']
       @handle = body['handle']
       @did = body['did']
@@ -63,6 +68,12 @@ module Arroba
 
     def authorize_request!(request, with_auth)
       request['Authorization'] = "Bearer #{@bearer_token}" if @always_auth || with_auth
+    end
+
+    def proxy_request!(request, uri)
+      return if @atproto_proxy.nil? || !uri.to_s.include?(@proxy_check)
+
+      request['atproto-proxy'] = @atproto_proxy
     end
 
     def json_request(url, body, method: :post, with_auth: false)
@@ -81,6 +92,7 @@ module Arroba
       req_class = Object.const_get "Net::HTTP::#{method.capitalize}"
       request = req_class.new(uri)
       authorize_request! request, with_auth
+      proxy_request! request, uri
       request
     end
 
