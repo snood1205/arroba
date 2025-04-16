@@ -24,14 +24,7 @@ module Arroba
     end
 
     module ClassMethods
-      def basic_get(method_name)
-        define_method method_name do
-          url = construct_url self.class.name, method_name
-          request :get, url:
-        end
-      end
-
-      def get_with_query_params(method_name, *required_params, **optional_params)
+      def basic_get(method_name, *required_params, **optional_params)
         allowed_params = required_params + optional_params.keys
 
         define_method method_name do |**initial_query_params|
@@ -40,9 +33,11 @@ module Arroba
           query_params = merge_query_params optional_params, initial_query_params
 
           yield(**query_params) if block_given?
+          url = construct_url self.class.name, method_name
+          return request(:get, url:) if query_params.empty?
+
           camelized_query_params = query_params.transform_keys { |key| camelize key.to_s }
 
-          url = construct_url self.class.name, method_name
           request :get, url:, query_params: camelized_query_params
         end
       end

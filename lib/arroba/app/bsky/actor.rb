@@ -10,11 +10,11 @@ module Arroba
         include Validations::Limitable
 
         basic_get :get_preferences
-        get_with_query_params :get_profile, :actor
-        get_with_query_params :get_profiles, :actors
-        get_with_query_params :get_suggestions, limit: nil, &DEFAULT_LIMIT
-        get_with_query_params :search_actors, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
-        get_with_query_params :search_actors_typeahead, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
+        basic_get :get_profile, :actor
+        basic_get :get_profiles, :actors
+        basic_get :get_suggestions, limit: nil, &DEFAULT_LIMIT
+        basic_get :search_actors, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
+        basic_get :search_actors_typeahead, :q, limit: nil, with_auth: false, &DEFAULT_LIMIT
         basic_post :put_preferences, :preferences
       end
     end

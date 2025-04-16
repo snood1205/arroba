@@ -18,7 +18,7 @@ module Arroba
 
       module ClassMethods
         def get_with_enforced_limit(method_name, *, limit: nil, cursor: nil, **)
-          get_with_query_params method_name, *, limit:, cursor:, ** do |**query_params|
+          basic_get method_name, *, limit:, cursor:, ** do |**query_params|
             DEFAULT_LIMIT.call(limit:, **query_params)
 
             yield if block_given?
