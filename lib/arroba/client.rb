@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'base_resource'
-require_relative 'bsky'
+require_relative 'app'
+require_relative 'chat'
 require_relative 'http_client'
 
 module Arroba
@@ -12,13 +13,19 @@ module Arroba
   #    app = Arroba::Client.new(identifier: 'your_identifier', password: 'your_password')
   #    app.bsky.actor.get_profile(actor: 'example_handle')
   class Client
-    attr_reader :bsky
-
-    def initialize(identifier: nil, password: nil, base_url: 'https://bsky.social')
+    def initialize(identifier: nil, password: nil, auth_url: 'https://bsky.social')
       raise ArgumentError, 'Both identifier and password are required' if identifier.nil? || password.nil?
 
-      @client = HTTPClient.new(identifier:, password:, base_url:)
-      @bsky = BSky.new(@client)
+      @client = HTTPClient.new(identifier:, password:, auth_url:)
+    end
+
+    def app = @app ||= App.new(@client)
+
+    def chat
+      return @chat unless @chat.nil?
+
+      @client.proxy_for_chat!
+      @chat = Chat.new(@client)
     end
   end
 end
