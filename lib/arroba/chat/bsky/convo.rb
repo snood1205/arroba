@@ -9,10 +9,10 @@ module Arroba
         include Validations::Limitable
         basic_post :accept_convo, :convo_id
         basic_post :delete_message_for_self, :convo_id, :message_id
-        get_with_query_params :get_convo_availability, :members
-        get_with_query_params :get_convo_for_members, :members
-        get_with_query_params :get_convo, :convo_id
-        get_with_query_params :get_log, cursor: nil
+        basic_get :get_convo_availability, :members
+        basic_get :get_convo_for_members, :members
+        basic_get :get_convo, :convo_id
+        basic_get :get_log, cursor: nil
         get_with_enforced_limit :get_messages, :convo_id
         basic_post :leave_convo, :convo_id
         get_with_enforced_limit :list_convos, read_state: nil, status: nil
