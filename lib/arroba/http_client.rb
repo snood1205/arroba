@@ -50,6 +50,12 @@ module Arroba
       @proxy_check = 'chat'
     end
 
+    def pds_client_with_url(pds_url)
+      dup_client = dup
+      dup_client.instance_variable_set(:@base_url, pds_url)
+      dup_client
+    end
+
     private
 
     def authenticate!(auth_url, identifier, password)
