@@ -5,6 +5,7 @@ module Arroba
     class ATProto
       class Identity < BaseResource
         basic_get :get_recommended_did_credentials
+        basic_post :refresh_identity, :identifier
       end
     end
   end
