@@ -9,24 +9,38 @@ module Arroba
 
       private
 
-      def transform_hash_to_be_converted_to_struct(hash_to_transform, class_name, debug: false)
-        puts hash_to_transform.inspect if debug
+      def transform_hash_to_be_converted_to_struct(hash_to_transform, class_name)
+        struct = scaffold_struct_from_hash hash_to_transform, class_name
         transformed_hash = hash_to_transform.each_with_object({}) do |(key, value), new_hash|
           snake_key = snakify key
-          new_hash[snake_key] = case value
-                                when Hash
-                                  transform_hash_to_be_converted_to_struct value, "#{class_name}::#{key.capitalize}"
-                                else value
-                                end
+          new_hash[snake_key] = transform_value value, key, class_name
         end
-        derive_struct_from_hash transformed_hash, class_name
+        struct.new(**transformed_hash)
       end
 
-      def derive_struct_from_hash(hash, class_name)
-        klass = Object.const_get class_name
-        keys_as_symbols = hash.keys.map(&:to_sym)
-        struct = klass.const_set 'Response', Struct.new(*keys_as_symbols, keyword_init: true)
-        struct.new(**hash)
+      def transform_value(value, key, class_name)
+        case value
+        when Hash
+          transform_hash_to_be_converted_to_struct value, "#{class_name}::#{key.capitalize}"
+        when Array
+          value.map { transform_value it, key, class_name }
+        else value
+        end
+      end
+
+      def scaffold_struct_from_hash(hash, class_name)
+        klass = class_from_class_name class_name
+        keys_as_symbols = hash.keys.map { |key| snakify(key).to_sym }
+        klass.const_set 'Response', Struct.new(*keys_as_symbols, keyword_init: true)
+      end
+
+      def class_from_class_name(class_name)
+        return Object.const_get class_name if Object.const_defined? class_name
+
+        *base_class_name_array, new_class_name = class_name.split '::'
+        base_class = Object.const_get base_class_name_array.join '::'
+
+        base_class.const_set new_class_name, Class.new
       end
 
       def snakify(camelized)

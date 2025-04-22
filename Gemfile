@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in arroba.gemspec
 gemspec
 
-gem 'pry'
+gem 'debug'
 gem 'rake'
 gem 'rdoc'
 gem 'rspec'
