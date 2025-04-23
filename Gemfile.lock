@@ -19,9 +19,11 @@ GEM
       ast (~> 2.4.1)
       racc
     prism (1.4.0)
-    pry (0.15.2)
+    pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-nav (1.0.0)
+      pry (>= 0.9.10, < 0.15)
     psych (5.2.3)
       date
       stringio
@@ -77,6 +79,7 @@ PLATFORMS
 DEPENDENCIES
   arroba!
   pry
+  pry-nav
   rake
   rdoc
   rspec

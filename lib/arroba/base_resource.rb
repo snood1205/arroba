@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'validations'
+require_relative 'response_handler'
+
 module Arroba
   # Serves as a base class for all resources in the Arroba gem.
   #
@@ -33,12 +36,13 @@ module Arroba
           query_params = merge_query_params optional_params, initial_query_params
 
           yield(**query_params) if block_given?
-          url = construct_url self.class.name, method_name
-          return request(:get, url:) if query_params.empty?
+          class_name = self.class.name
+          url = construct_url class_name, method_name
+          return request(:get, url:, class_name:) if query_params.empty?
 
           camelized_query_params = query_params.transform_keys { |key| camelize key.to_s }
 
-          request :get, url:, query_params: camelized_query_params
+          request :get, url:, query_params: camelized_query_params, class_name:
         end
       end
 
@@ -47,8 +51,9 @@ module Arroba
           validate_missing! required_params, body
           validate_extra! required_params, body
           camelized_body = body.transform_keys { |key| camelize key.to_s }
-          url = construct_url self.class.name, method_name
-          request :post, url:, body: camelized_body
+          class_name = self.class.name
+          url = construct_url class_name, method_name
+          request :post, url:, body: camelized_body, class_name:
         end
       end
     end
@@ -79,14 +84,9 @@ module Arroba
       @client = client
     end
 
-    def request(method, url: nil, **)
-      url ||= derive_url_from_label caller_locations[1].label
-      @client.send(method, url, **)
-    end
-
-    def derive_url_from_label(label)
-      class_name, method = label.split.last.downcase.split '#' if label && !class_name && !method
-      construct_url(class_name, method)
+    def request(method, url:, class_name:, **)
+      response_as_hash = @client.send(method, url, **)
+      ResponseHandler.handle response_as_hash, class_name
     end
 
     def construct_url(class_name, method)
