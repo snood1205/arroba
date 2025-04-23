@@ -17,5 +17,6 @@ end
 require 'rubygems'
 require 'bundler/setup'
 require 'arroba'
+require 'pry-nav'
 
-load Gem.bin_path('irb', 'irb')
+load Gem.bin_path('pry', 'pry')
