@@ -17,6 +17,8 @@ module Arroba
 
       def admin = @admin ||= Admin.new(@client)
       def identity = @identity ||= Identity.new(@client)
+      def label = @label ||= Label.new(@client)
+      def moderation = @moderation ||= Moderation.new(@client)
     end
   end
 end

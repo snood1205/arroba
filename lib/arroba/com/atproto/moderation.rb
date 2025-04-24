@@ -4,6 +4,7 @@ module Arroba
   class Com
     class ATProto
       class Moderation < BaseResource
+        basic_post :create_report, :reason_type, :subject, reason: nil
       end
     end
   end
