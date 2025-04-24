@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../validations'
-
 module Arroba
   class App
     class BSky
