@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'validations'
+
 module Arroba
   # Serves as a base class for all resources in the Arroba gem.
   #
